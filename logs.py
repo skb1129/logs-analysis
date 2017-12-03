@@ -1,29 +1,36 @@
-"""
-Q1 :-
-create or replace view article_views as
-select title, author, count(*) as views from
-articles join log on
-path = concat('/article/', slug)
-group by title, author;
+#!/usr/bin/env python3
+import psycopg2
 
-select * from article_views order by views desc limit 3;
+db = psycopg2.connect(database='news')
+cur = db.cursor()
+
+def execute_query(title, query, unit):
+	cur.execute(query)
+	results = cur.fetchall()
+	print(title)
+	for result in results:
+		print(str(result[0]) + '  --->  ' + str(result[1]) + unit)
+	print()
 
 
-Q2 :-
-create view author_views as
-select name, sum(views) as views
-from article_views join authors
-on author = id
-group by name;
+titles = []
+queries = []
+units = []
 
-select * from author_views order by views desc limit 4;
+titles.append('What are the most popular three articles of all time?')
+queries.append('select * from article_views order by views desc limit 3;')
+units.append(' views')
 
-Q3 :-
-create view error_logs as
-select date(time) as date,
-round(100.0*sum(case status when '200 OK'
-then 0 else 1 end)/count(status),1) as error
-from log group by date;
+titles.append('Who are the most popular article authors of all time?')
+queries.append('select * from author_views order by views desc limit 4;')
+units.append(' views')
 
-select * from error_logs where error > 1;
-"""
+titles.append('On which days did more than 1% of requests lead to errors?')
+queries.append('select * from error_logs where error > 1;')
+units.append(' %')
+
+
+for title, query, unit in zip(titles, queries, units):
+	execute_query(title, query, unit)
+
+db.close()
