@@ -4,13 +4,14 @@ import psycopg2
 db = psycopg2.connect(database='news')
 cur = db.cursor()
 
+
 def execute_query(title, query, unit):
-	cur.execute(query)
-	results = cur.fetchall()
-	print(title)
-	for result in results:
-		print(str(result[0]) + '  --->  ' + str(result[1]) + unit)
-	print()
+    cur.execute(query)
+    results = cur.fetchall()
+    print(title)
+    for result in results:
+        print(str(result[0]) + '  --->  ' + str(result[1]) + unit)
+    print()
 
 
 titles = []
@@ -31,6 +32,6 @@ units.append(' %')
 
 
 for title, query, unit in zip(titles, queries, units):
-	execute_query(title, query, unit)
+    execute_query(title, query, unit)
 
 db.close()
